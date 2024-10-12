@@ -193,6 +193,17 @@ namespace AddressBookSystem
             }
         }
 
+        public List<Contact> GetContactsByCity(string city)
+        {
+            return contacts.Where(c => c.City.Equals(city, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        
+        public List<Contact> GetContactsByState(string state)
+        {
+            return contacts.Where(c => c.State.Equals(state, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
 
     }
 
@@ -253,11 +264,55 @@ namespace AddressBookSystem
             }
         }
 
+        public List<Contact> SearchContactsByCityOrState(string location, bool isCity)
+        {
+            List<Contact> matchingContacts = new List<Contact>();
+
+            foreach (var addressBook in addressBooks.Values)
+            {
+                
+                if (isCity)
+                {
+                    matchingContacts.AddRange(addressBook.GetContactsByCity(location));
+                }
+                else
+                {
+                    matchingContacts.AddRange(addressBook.GetContactsByState(location));
+                }
+            }
+
+            return matchingContacts;
+        }
+
     }
 
     internal class AddressBookMain
     {
+        static void SearchContacts(AddressBookManager manager)
+        {
+            Console.WriteLine("Search by:\n1. City\n2. State");
+            int searchOption = int.Parse(Console.ReadLine());
 
+            Console.Write("Enter the name of the City or State: ");
+            string location = Console.ReadLine();
+
+            bool isCity = (searchOption == 1);
+
+            List<Contact> results = manager.SearchContactsByCityOrState(location, isCity);
+
+            if (results.Count > 0)
+            {
+                Console.WriteLine($"Contacts found in {location}:");
+                foreach (var contact in results)
+                {
+                    Console.WriteLine(contact.ToString());
+                }
+            }
+            else
+            {
+                Console.WriteLine($"No contacts found in {location}.");
+            }
+        }
         static void Main(string[] args)
         {
             Console.WriteLine(new String('-', 50));
@@ -275,7 +330,8 @@ namespace AddressBookSystem
                 Console.WriteLine("2. Select Address Book");
                 Console.WriteLine("3. Display Address Books");
                 Console.WriteLine("4. Delete Address Book");
-                Console.WriteLine("5. Exit");
+                Console.WriteLine("5. Search by City or State");
+                Console.WriteLine("6. Exit");
                 Console.Write("Choose an option: ");
                 char option = Convert.ToChar(Console.ReadLine());
 
@@ -308,6 +364,10 @@ namespace AddressBookSystem
                         break;
 
                     case '5':
+                        SearchContacts(addressBookManager);
+                        break;
+
+                    case '6':
                         exit = true;
                         break;
 
