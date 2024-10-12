@@ -74,16 +74,18 @@ namespace AddressBookSystem
     public class AddressBook
         {
         private List<Contact> contacts;
-
+        private AddressBookManager manager;
         public AddressBook()
         {
             contacts = new List<Contact>();
+            this.manager = manager;
         }
 
         
         public void AddContact()
         {
             AddressBook addressBook = new AddressBook();
+            
 
             Console.Write("Enter First Name: ");
             string firstName = Console.ReadLine();
@@ -131,6 +133,7 @@ namespace AddressBookSystem
                 else
                 {
                     contacts.Add(contact);
+                    manager.AddToCityAndStateDictionaries(contact);
                     Console.WriteLine("Contact added successfully.");
                 }
             }
@@ -142,9 +145,17 @@ namespace AddressBookSystem
 
         public void DisplayContacts()
         {
-            foreach (var contact in contacts)
+            if (contacts.Count == 0)
             {
-                Console.WriteLine($"{contact.FirstName} {contact.LastName}");
+                Console.WriteLine("No contacts found in this address book.");
+            }
+            else
+            {
+                Console.WriteLine("Contacts in this address book:");
+                foreach (var contact in contacts)
+                {
+                    Console.WriteLine(contact.ToString());
+                }
             }
         }
         public void EditContact(string firstName, string lastName)
@@ -185,6 +196,7 @@ namespace AddressBookSystem
             if (contact != null)
             {
                 contacts.Remove(contact);
+                manager.RemoveFromCityAndStateDictionaries(contact);
                 Console.WriteLine("Contact deleted successfully.");
             }
             else
@@ -205,15 +217,25 @@ namespace AddressBookSystem
         }
 
 
+
+
     }
 
     public class AddressBookManager
     {
+
         private Dictionary<string, AddressBook> addressBooks;
 
+       
+        private Dictionary<string, List<Contact>> cityDictionary;
+        private Dictionary<string, List<Contact>> stateDictionary;
+
+        
         public AddressBookManager()
         {
             addressBooks = new Dictionary<string, AddressBook>();
+            cityDictionary = new Dictionary<string, List<Contact>>();
+            stateDictionary = new Dictionary<string, List<Contact>>();
         }
 
         public void AddAddressBook(string name)
@@ -254,7 +276,7 @@ namespace AddressBookSystem
         {
             if (addressBooks.ContainsKey(name))
             {
-                // Remove the address book from the dictionary
+                
                 addressBooks.Remove(name);
                 Console.WriteLine($"Address book '{name}' deleted successfully.");
             }
@@ -284,10 +306,86 @@ namespace AddressBookSystem
             return matchingContacts;
         }
 
+        public void AddToCityAndStateDictionaries(Contact contact)
+        {
+            
+            if (!cityDictionary.ContainsKey(contact.City))
+            {
+                cityDictionary[contact.City] = new List<Contact>();
+            }
+            cityDictionary[contact.City].Add(contact);
+
+            
+            if (!stateDictionary.ContainsKey(contact.State))
+            {
+                stateDictionary[contact.State] = new List<Contact>();
+            }
+            stateDictionary[contact.State].Add(contact);
+        }
+
+       
+        public void RemoveFromCityAndStateDictionaries(Contact contact)
+        {
+           
+            if (cityDictionary.ContainsKey(contact.City))
+            {
+                cityDictionary[contact.City].Remove(contact);
+                if (cityDictionary[contact.City].Count == 0)
+                {
+                    cityDictionary.Remove(contact.City); 
+                }
+            }
+
+            
+            if (stateDictionary.ContainsKey(contact.State))
+            {
+                stateDictionary[contact.State].Remove(contact);
+                if (stateDictionary[contact.State].Count == 0)
+                {
+                    stateDictionary.Remove(contact.State); 
+                }
+            }
+        }
+
+        
+        public void ViewPersonsByCity(string city)
+        {
+            if (cityDictionary.ContainsKey(city))
+            {
+                Console.WriteLine($"Contacts in {city}:");
+                foreach (var contact in cityDictionary[city])
+                {
+                    Console.WriteLine(contact.ToString());
+                }
+            }
+            else
+            {
+                Console.WriteLine($"No contacts found in {city}.");
+            }
+        }
+
+        
+        public void ViewPersonsByState(string state)
+        {
+            if (stateDictionary.ContainsKey(state))
+            {
+                Console.WriteLine($"Contacts in {state}:");
+                foreach (var contact in stateDictionary[state])
+                {
+                    Console.WriteLine(contact.ToString());
+                }
+            }
+            else
+            {
+                Console.WriteLine($"No contacts found in {state}.");
+            }
+        }
+
     }
 
     internal class AddressBookMain
     {
+
         static void SearchContacts(AddressBookManager manager)
         {
             Console.WriteLine("Search by:\n1. City\n2. State");
@@ -330,8 +428,9 @@ namespace AddressBookSystem
                 Console.WriteLine("2. Select Address Book");
                 Console.WriteLine("3. Display Address Books");
                 Console.WriteLine("4. Delete Address Book");
-                Console.WriteLine("5. Search by City or State");
-                Console.WriteLine("6. Exit");
+                Console.WriteLine("5. View Persons by City");
+                Console.WriteLine("6. View Persons by State");
+                Console.WriteLine("7. Exit");
                 Console.Write("Choose an option: ");
                 char option = Convert.ToChar(Console.ReadLine());
 
@@ -364,10 +463,18 @@ namespace AddressBookSystem
                         break;
 
                     case '5':
-                        SearchContacts(addressBookManager);
+                        Console.Write("Enter the name of the City: ");
+                        string city = Console.ReadLine();
+                        addressBookManager.ViewPersonsByCity(city);
                         break;
 
                     case '6':
+                        Console.Write("Enter the name of the State: ");
+                        string state = Console.ReadLine();
+                        addressBookManager.ViewPersonsByState(state);
+                        break;
+
+                    case '7':
                         exit = true;
                         break;
 
@@ -379,7 +486,7 @@ namespace AddressBookSystem
 
             }
 
-            //Edit,delete a contact
+           
         static void ManageAddressBook(AddressBook selectedBook)
             {
                 bool keepRunning = true;
