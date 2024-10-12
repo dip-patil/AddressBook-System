@@ -171,68 +171,189 @@ namespace AddressBookSystem
 
 
     }
+
+    public class AddressBookManager
+    {
+        private Dictionary<string, AddressBook> addressBooks;
+
+        public AddressBookManager()
+        {
+            addressBooks = new Dictionary<string, AddressBook>();
+        }
+
+        public void AddAddressBook(string name)
+        {
+            if (!addressBooks.ContainsKey(name))
+            {
+                addressBooks[name] = new AddressBook();
+                Console.WriteLine($"Address book '{name}' added.");
+            }
+            else
+            {
+                Console.WriteLine("Address book with this name already exists.");
+            }
+        }
+
+        public AddressBook GetAddressBook(string name)
+        {
+            if (addressBooks.ContainsKey(name))
+            {
+                return addressBooks[name];
+            }
+
+            Console.WriteLine("Address book not found.");
+            return null;
+        }
+
+        public void DisplayAddressBooks()
+        {
+            Console.WriteLine("Available Address Books:");
+            foreach (var book in addressBooks)
+            {
+                Console.WriteLine($"- {book.Key}");
+            }
+        }
+
+        
+        public void DeleteAddressBook(string name)
+        {
+            if (addressBooks.ContainsKey(name))
+            {
+                // Remove the address book from the dictionary
+                addressBooks.Remove(name);
+                Console.WriteLine($"Address book '{name}' deleted successfully.");
+            }
+            else
+            {
+                Console.WriteLine($"Address book '{name}' not found.");
+            }
+        }
+
+    }
+
     internal class AddressBookMain
     {
-        
+
         static void Main(string[] args)
         {
             Console.WriteLine(new String('-', 50));
             Console.WriteLine("Welcome to Address Book System");
             Console.WriteLine(new String('-', 50));
 
-            AddressBook addressBook = new AddressBook();
+             AddressBookManager addressBookManager = new AddressBookManager();
 
+            bool exit = false;
 
-            //Edit,delete a contact
-            bool keepRunning = true;
-
-            while (keepRunning)
+            while (!exit)
             {
+                Console.WriteLine("\nMenu:");
+                Console.WriteLine("1. Add Address Book");
+                Console.WriteLine("2. Select Address Book");
+                Console.WriteLine("3. Display Address Books");
+                Console.WriteLine("4. Delete Address Book");
+                Console.WriteLine("5. Exit");
+                Console.Write("Choose an option: ");
+                char option = Convert.ToChar(Console.ReadLine());
 
-                Console.WriteLine("Choose an option:");
-
-                Console.WriteLine("Enter 1 to add a contact: ");
-                Console.WriteLine("Enter 2 to edit a contact: ");
-
-                Console.WriteLine("Enter 3 to delete a contact: ");
-                Console.WriteLine("Enter 4 to exit: ");
-                char c = Convert.ToChar(Console.ReadLine());
-                switch (c)
+                switch (option)
                 {
                     case '1':
-                        addressBook.AddContact();
+                        Console.Write("Enter name for the new Address Book: ");
+                        string bookName = Console.ReadLine();
+                        addressBookManager.AddAddressBook(bookName);
                         break;
+
                     case '2':
-                        Console.WriteLine("Enter the first name of the contact to edit: ");
-                        string editFirstName = Console.ReadLine();
-                        Console.WriteLine("Enter the last name of the contact to edit: ");
-                        string editLastName = Console.ReadLine();
-                        addressBook.EditContact(editFirstName, editLastName);
+                        Console.Write("Enter the name of the Address Book to select: ");
+                        string selectedBookName = Console.ReadLine();
+                        AddressBook selectedBook = addressBookManager.GetAddressBook(selectedBookName);
+                        if (selectedBook != null)
+                        {
+                            ManageAddressBook(selectedBook);
+                        }
                         break;
 
                     case '3':
-                        Console.WriteLine("Enter the first name of the contact to delete: ");
-                        string deleteFirstName = Console.ReadLine();
-                        Console.WriteLine("Enter the last name of the contact to delete: ");
-                        string deleteLastName = Console.ReadLine();
-                        addressBook.DeleteContact(deleteFirstName, deleteLastName);
+                        addressBookManager.DisplayAddressBooks();
                         break;
+
                     case '4':
-                        keepRunning = false;
+                        Console.Write("Enter the name of the Address Book to delete: ");
+                        string deleteBookName = Console.ReadLine();
+                        addressBookManager.DeleteAddressBook(deleteBookName);
+                        break;
+
+                    case '5':
+                        exit = true;
                         break;
 
                     default:
-                        Console.WriteLine("Invalid input");
+                        Console.WriteLine("Invalid option. Please try again.");
                         break;
-
                 }
             }
-            
+
+            }
+
+            //Edit,delete a contact
+        static void ManageAddressBook(AddressBook selectedBook)
+            {
+                bool keepRunning = true;
+
+                while (keepRunning)
+                {
+
+                    Console.WriteLine("Choose an option:");
+
+                    Console.WriteLine("Enter 1 to add a contact: ");
+                    Console.WriteLine("Enter 2 to edit a contact: ");
+
+                    Console.WriteLine("Enter 3 to delete a contact: ");
+                    Console.WriteLine("Enter 4 to display contacts: ");
+                    Console.WriteLine("Enter 5 to exit: ");
+                    char c = Convert.ToChar(Console.ReadLine());
+                    switch (c)
+                    {
+                        case '1':
+                            selectedBook.AddContact();
+                            break;
+                        case '2':
+                            Console.WriteLine("Enter the first name of the contact to edit: ");
+                            string editFirstName = Console.ReadLine();
+                            Console.WriteLine("Enter the last name of the contact to edit: ");
+                            string editLastName = Console.ReadLine();
+                            selectedBook.EditContact(editFirstName, editLastName);
+                            break;
+
+                        case '3':
+                            Console.WriteLine("Enter the first name of the contact to delete: ");
+                            string deleteFirstName = Console.ReadLine();
+                            Console.WriteLine("Enter the last name of the contact to delete: ");
+                            string deleteLastName = Console.ReadLine();
+                            selectedBook.DeleteContact(deleteFirstName, deleteLastName);
+                            break;
+
+                        case '4':
+                            selectedBook.DisplayContacts();
+                            break;
+
+                        case '5':
+                            keepRunning = false;
+                            break;
+
+                        default:
+                            Console.WriteLine("Invalid input");
+                            break;
+
+                    }
+                }
 
 
-            addressBook.DisplayContacts();
 
-            Console.ReadLine(); 
-        }
+                
+
+                Console.ReadLine();
+            }
+        
     }
 }
