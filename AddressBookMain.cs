@@ -64,8 +64,47 @@ namespace AddressBookSystem
         }
 
         
-        public void AddContact(Contact contact)
+        public void AddContact()
         {
+            AddressBook addressBook = new AddressBook();
+
+            Console.Write("Enter First Name: ");
+            string firstName = Console.ReadLine();
+
+            Console.Write("Enter Last Name: ");
+            string lastName = Console.ReadLine();
+
+            Console.Write("Enter Address: ");
+            string address = Console.ReadLine();
+
+            Console.Write("Enter City: ");
+            string city = Console.ReadLine();
+
+            Console.Write("Enter State: ");
+            string state = Console.ReadLine();
+
+            Console.Write("Enter Zip: ");
+            string zip = Console.ReadLine();
+
+            Console.Write("Enter Phone Number: ");
+            string phoneNumber = Console.ReadLine();
+
+            Console.Write("Enter Email: ");
+            string email = Console.ReadLine();
+
+            // Create a new Contact
+            Contact contact = new Contact()
+            {
+                FirstName = firstName,
+                LastName = lastName,
+                Address = address,
+                City = city,
+                State = state,
+                Zip = zip,
+                PhoneNumber = phoneNumber,
+                Email = email
+            };
+
             if (contact.Validate())
             {
                 contacts.Add(contact);
@@ -140,47 +179,9 @@ namespace AddressBookSystem
             Console.WriteLine(new String('-', 50));
             Console.WriteLine("Welcome to Address Book System");
             Console.WriteLine(new String('-', 50));
+
             AddressBook addressBook = new AddressBook();
 
-            Console.Write("Enter First Name: ");
-            string firstName = Console.ReadLine();
-
-            Console.Write("Enter Last Name: ");
-            string lastName = Console.ReadLine();
-
-            Console.Write("Enter Address: ");
-            string address = Console.ReadLine();
-
-            Console.Write("Enter City: ");
-            string city = Console.ReadLine();
-
-            Console.Write("Enter State: ");
-            string state = Console.ReadLine();
-
-            Console.Write("Enter Zip: ");
-            string zip = Console.ReadLine();
-
-            Console.Write("Enter Phone Number: ");
-            string phoneNumber = Console.ReadLine();
-
-            Console.Write("Enter Email: ");
-            string email = Console.ReadLine();
-
-            // Create a new Contact
-            Contact contact = new Contact()
-            {
-                FirstName = firstName,
-                LastName = lastName,
-                Address = address,
-                City = city,
-                State = state,
-                Zip = zip,
-                PhoneNumber = phoneNumber,
-                Email = email
-            };
-
-            // Add the contact to the address book
-            addressBook.AddContact(contact);
 
             //Edit,delete a contact
             bool keepRunning = true;
@@ -190,14 +191,18 @@ namespace AddressBookSystem
 
                 Console.WriteLine("Choose an option:");
 
-                Console.WriteLine("Enter 1 to edit a contact: ");
+                Console.WriteLine("Enter 1 to add a contact: ");
+                Console.WriteLine("Enter 2 to edit a contact: ");
 
-                Console.WriteLine("Enter 2 to delete a contact: ");
-                Console.WriteLine("Enter 3 to exit: ");
+                Console.WriteLine("Enter 3 to delete a contact: ");
+                Console.WriteLine("Enter 4 to exit: ");
                 char c = Convert.ToChar(Console.ReadLine());
                 switch (c)
                 {
                     case '1':
+                        addressBook.AddContact();
+                        break;
+                    case '2':
                         Console.WriteLine("Enter the first name of the contact to edit: ");
                         string editFirstName = Console.ReadLine();
                         Console.WriteLine("Enter the last name of the contact to edit: ");
@@ -205,14 +210,14 @@ namespace AddressBookSystem
                         addressBook.EditContact(editFirstName, editLastName);
                         break;
 
-                    case '2':
+                    case '3':
                         Console.WriteLine("Enter the first name of the contact to delete: ");
                         string deleteFirstName = Console.ReadLine();
                         Console.WriteLine("Enter the last name of the contact to delete: ");
                         string deleteLastName = Console.ReadLine();
                         addressBook.DeleteContact(deleteFirstName, deleteLastName);
                         break;
-                    case '3':
+                    case '4':
                         keepRunning = false;
                         break;
 
