@@ -84,6 +84,38 @@ namespace AddressBookSystem
                 Console.WriteLine($"{contact.FirstName} {contact.LastName}");
             }
         }
+        public void EditContact(string firstName, string lastName)
+        {
+            Contact contact = contacts.Find(c => c.FirstName == firstName && c.LastName == lastName);
+
+            if (contact != null)
+            {
+                Console.WriteLine("Enter new Address: ");
+                contact.Address = Console.ReadLine();
+
+                Console.WriteLine("Enter new City: ");
+                contact.City = Console.ReadLine();
+
+                Console.WriteLine("Enter new State: ");
+                contact.State = Console.ReadLine();
+
+                Console.WriteLine("Enter new Zip: ");
+                contact.Zip = Console.ReadLine();
+
+                Console.WriteLine("Enter new Phone Number: ");
+                contact.PhoneNumber = Console.ReadLine();
+
+                Console.WriteLine("Enter new Email: ");
+                contact.Email = Console.ReadLine();
+
+                Console.WriteLine("Contact updated successfully.");
+            }
+            else
+            {
+                Console.WriteLine("Contact not found.");
+            }
+        }
+
     }
     internal class AddressBookMain
     {
@@ -134,6 +166,27 @@ namespace AddressBookSystem
 
             // Add the contact to the address book
             addressBook.AddContact(contact);
+            
+            Console.WriteLine("Enter 1 to edit a contact: ");
+            char c = Convert.ToChar(Console.ReadLine());
+            switch (c)
+            {
+                case '1':
+                    Console.WriteLine("Enter the first name of the contact to edit: ");
+                    string editFirstName = Console.ReadLine();
+                    Console.WriteLine("Enter the last name of the contact to edit: ");
+                    string editLastName = Console.ReadLine();
+                    addressBook.EditContact(editFirstName, editLastName);
+                    break;
+                
+                default:
+                    Console.WriteLine("Invalid input");
+                    break;
+
+            }
+
+            addressBook.DisplayContacts();
+
             Console.ReadLine(); 
         }
     }
