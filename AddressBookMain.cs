@@ -53,6 +53,23 @@ namespace AddressBookSystem
             return true;
 
         }
+        public override bool Equals(object obj)
+        {
+            
+            if (obj is Contact otherContact)
+            {
+                
+                return FirstName.Equals(otherContact.FirstName, StringComparison.OrdinalIgnoreCase) &&
+                       LastName.Equals(otherContact.LastName, StringComparison.OrdinalIgnoreCase);
+            }
+            return false;
+        }
+
+        
+        public override string ToString()
+        {
+            return $"{FirstName} {LastName}, {Address}, {City}, {State}, {Zip}, {PhoneNumber}, {Email}";
+        }
     }
     public class AddressBook
         {
@@ -107,8 +124,15 @@ namespace AddressBookSystem
 
             if (contact.Validate())
             {
-                contacts.Add(contact);
-                Console.WriteLine("Contact added successfully.");
+                if (contacts.Contains(contact))
+                {
+                    Console.WriteLine("Duplicate contact found! This person already exists in the address book.");
+                }
+                else
+                {
+                    contacts.Add(contact);
+                    Console.WriteLine("Contact added successfully.");
+                }
             }
             else
             {
