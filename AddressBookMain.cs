@@ -115,6 +115,21 @@ namespace AddressBookSystem
                 Console.WriteLine("Contact not found.");
             }
         }
+        public void DeleteContact(string firstName, string lastName)
+        {
+            Contact contact = contacts.Find(c => c.FirstName == firstName && c.LastName == lastName);
+
+            if (contact != null)
+            {
+                contacts.Remove(contact);
+                Console.WriteLine("Contact deleted successfully.");
+            }
+            else
+            {
+                Console.WriteLine("Contact not found.");
+            }
+        }
+
 
     }
     internal class AddressBookMain
@@ -166,24 +181,49 @@ namespace AddressBookSystem
 
             // Add the contact to the address book
             addressBook.AddContact(contact);
-            
-            Console.WriteLine("Enter 1 to edit a contact: ");
-            char c = Convert.ToChar(Console.ReadLine());
-            switch (c)
-            {
-                case '1':
-                    Console.WriteLine("Enter the first name of the contact to edit: ");
-                    string editFirstName = Console.ReadLine();
-                    Console.WriteLine("Enter the last name of the contact to edit: ");
-                    string editLastName = Console.ReadLine();
-                    addressBook.EditContact(editFirstName, editLastName);
-                    break;
-                
-                default:
-                    Console.WriteLine("Invalid input");
-                    break;
 
+            //Edit,delete a contact
+            bool keepRunning = true;
+
+            while (keepRunning)
+            {
+
+                Console.WriteLine("Choose an option:");
+
+                Console.WriteLine("Enter 1 to edit a contact: ");
+
+                Console.WriteLine("Enter 2 to delete a contact: ");
+                Console.WriteLine("Enter 3 to exit: ");
+                char c = Convert.ToChar(Console.ReadLine());
+                switch (c)
+                {
+                    case '1':
+                        Console.WriteLine("Enter the first name of the contact to edit: ");
+                        string editFirstName = Console.ReadLine();
+                        Console.WriteLine("Enter the last name of the contact to edit: ");
+                        string editLastName = Console.ReadLine();
+                        addressBook.EditContact(editFirstName, editLastName);
+                        break;
+
+                    case '2':
+                        Console.WriteLine("Enter the first name of the contact to delete: ");
+                        string deleteFirstName = Console.ReadLine();
+                        Console.WriteLine("Enter the last name of the contact to delete: ");
+                        string deleteLastName = Console.ReadLine();
+                        addressBook.DeleteContact(deleteFirstName, deleteLastName);
+                        break;
+                    case '3':
+                        keepRunning = false;
+                        break;
+
+                    default:
+                        Console.WriteLine("Invalid input");
+                        break;
+
+                }
             }
+            
+
 
             addressBook.DisplayContacts();
 
