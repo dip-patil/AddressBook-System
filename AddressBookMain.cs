@@ -55,37 +55,39 @@ namespace AddressBookSystem
         }
         public override bool Equals(object obj)
         {
-            
+
             if (obj is Contact otherContact)
             {
-                
+
                 return FirstName.Equals(otherContact.FirstName, StringComparison.OrdinalIgnoreCase) &&
                        LastName.Equals(otherContact.LastName, StringComparison.OrdinalIgnoreCase);
             }
             return false;
         }
 
-        
+
         public override string ToString()
         {
             return $"{FirstName} {LastName}, {Address}, {City}, {State}, {Zip}, {PhoneNumber}, {Email}";
         }
     }
     public class AddressBook
-        {
+    {
         private List<Contact> contacts;
         private AddressBookManager manager;
-        public AddressBook()
+        public AddressBook(AddressBookManager manager)
         {
             contacts = new List<Contact>();
             this.manager = manager;
+            
         }
-
         
+
+
         public void AddContact()
         {
-            AddressBook addressBook = new AddressBook();
             
+
 
             Console.Write("Enter First Name: ");
             string firstName = Console.ReadLine();
@@ -210,7 +212,7 @@ namespace AddressBookSystem
             return contacts.Where(c => c.City.Equals(city, StringComparison.OrdinalIgnoreCase)).ToList();
         }
 
-        
+
         public List<Contact> GetContactsByState(string state)
         {
             return contacts.Where(c => c.State.Equals(state, StringComparison.OrdinalIgnoreCase)).ToList();
@@ -226,11 +228,11 @@ namespace AddressBookSystem
 
         private Dictionary<string, AddressBook> addressBooks;
 
-       
+
         private Dictionary<string, List<Contact>> cityDictionary;
         private Dictionary<string, List<Contact>> stateDictionary;
 
-        
+
         public AddressBookManager()
         {
             addressBooks = new Dictionary<string, AddressBook>();
@@ -242,7 +244,7 @@ namespace AddressBookSystem
         {
             if (!addressBooks.ContainsKey(name))
             {
-                addressBooks[name] = new AddressBook();
+                addressBooks[name] = new AddressBook(this);
                 Console.WriteLine($"Address book '{name}' added.");
             }
             else
@@ -271,12 +273,12 @@ namespace AddressBookSystem
             }
         }
 
-        
+
         public void DeleteAddressBook(string name)
         {
             if (addressBooks.ContainsKey(name))
             {
-                
+
                 addressBooks.Remove(name);
                 Console.WriteLine($"Address book '{name}' deleted successfully.");
             }
@@ -292,7 +294,7 @@ namespace AddressBookSystem
 
             foreach (var addressBook in addressBooks.Values)
             {
-                
+
                 if (isCity)
                 {
                     matchingContacts.AddRange(addressBook.GetContactsByCity(location));
@@ -311,43 +313,54 @@ namespace AddressBookSystem
             
             if (!cityDictionary.ContainsKey(contact.City))
             {
-                cityDictionary[contact.City] = new List<Contact>();
+                cityDictionary[contact.City] = new List<Contact>() { contact};
             }
-            cityDictionary[contact.City].Add(contact);
+            else
+            {
+                cityDictionary[contact.City].Add(contact);
+            }
+            
+            
 
             
             if (!stateDictionary.ContainsKey(contact.State))
             {
-                stateDictionary[contact.State] = new List<Contact>();
+                stateDictionary[contact.State] = new List<Contact>() { contact};
             }
-            stateDictionary[contact.State].Add(contact);
+            else
+            {
+                stateDictionary[contact.State].Add(contact);    
+            }
+            
+            
         }
 
-       
+
+
         public void RemoveFromCityAndStateDictionaries(Contact contact)
         {
-           
+
             if (cityDictionary.ContainsKey(contact.City))
             {
                 cityDictionary[contact.City].Remove(contact);
                 if (cityDictionary[contact.City].Count == 0)
                 {
-                    cityDictionary.Remove(contact.City); 
+                    cityDictionary.Remove(contact.City);
                 }
             }
 
-            
+
             if (stateDictionary.ContainsKey(contact.State))
             {
                 stateDictionary[contact.State].Remove(contact);
                 if (stateDictionary[contact.State].Count == 0)
                 {
-                    stateDictionary.Remove(contact.State); 
+                    stateDictionary.Remove(contact.State);
                 }
             }
         }
 
-        
+
         public void ViewPersonsByCity(string city)
         {
             if (cityDictionary.ContainsKey(city))
@@ -364,7 +377,7 @@ namespace AddressBookSystem
             }
         }
 
-        
+
         public void ViewPersonsByState(string state)
         {
             if (stateDictionary.ContainsKey(state))
@@ -417,7 +430,7 @@ namespace AddressBookSystem
             Console.WriteLine("Welcome to Address Book System");
             Console.WriteLine(new String('-', 50));
 
-             AddressBookManager addressBookManager = new AddressBookManager();
+            AddressBookManager addressBookManager = new AddressBookManager();
 
             bool exit = false;
 
@@ -484,67 +497,67 @@ namespace AddressBookSystem
                 }
             }
 
-            }
+        }
 
-           
+
         static void ManageAddressBook(AddressBook selectedBook)
+        {
+            bool keepRunning = true;
+
+            while (keepRunning)
             {
-                bool keepRunning = true;
 
-                while (keepRunning)
+                Console.WriteLine("Choose an option:");
+
+                Console.WriteLine("Enter 1 to add a contact: ");
+                Console.WriteLine("Enter 2 to edit a contact: ");
+
+                Console.WriteLine("Enter 3 to delete a contact: ");
+                Console.WriteLine("Enter 4 to display contacts: ");
+                Console.WriteLine("Enter 5 to exit: ");
+                char c = Convert.ToChar(Console.ReadLine());
+                switch (c)
                 {
+                    case '1':
+                        selectedBook.AddContact();
+                        break;
+                    case '2':
+                        Console.WriteLine("Enter the first name of the contact to edit: ");
+                        string editFirstName = Console.ReadLine();
+                        Console.WriteLine("Enter the last name of the contact to edit: ");
+                        string editLastName = Console.ReadLine();
+                        selectedBook.EditContact(editFirstName, editLastName);
+                        break;
 
-                    Console.WriteLine("Choose an option:");
+                    case '3':
+                        Console.WriteLine("Enter the first name of the contact to delete: ");
+                        string deleteFirstName = Console.ReadLine();
+                        Console.WriteLine("Enter the last name of the contact to delete: ");
+                        string deleteLastName = Console.ReadLine();
+                        selectedBook.DeleteContact(deleteFirstName, deleteLastName);
+                        break;
 
-                    Console.WriteLine("Enter 1 to add a contact: ");
-                    Console.WriteLine("Enter 2 to edit a contact: ");
+                    case '4':
+                        selectedBook.DisplayContacts();
+                        break;
 
-                    Console.WriteLine("Enter 3 to delete a contact: ");
-                    Console.WriteLine("Enter 4 to display contacts: ");
-                    Console.WriteLine("Enter 5 to exit: ");
-                    char c = Convert.ToChar(Console.ReadLine());
-                    switch (c)
-                    {
-                        case '1':
-                            selectedBook.AddContact();
-                            break;
-                        case '2':
-                            Console.WriteLine("Enter the first name of the contact to edit: ");
-                            string editFirstName = Console.ReadLine();
-                            Console.WriteLine("Enter the last name of the contact to edit: ");
-                            string editLastName = Console.ReadLine();
-                            selectedBook.EditContact(editFirstName, editLastName);
-                            break;
+                    case '5':
+                        keepRunning = false;
+                        break;
 
-                        case '3':
-                            Console.WriteLine("Enter the first name of the contact to delete: ");
-                            string deleteFirstName = Console.ReadLine();
-                            Console.WriteLine("Enter the last name of the contact to delete: ");
-                            string deleteLastName = Console.ReadLine();
-                            selectedBook.DeleteContact(deleteFirstName, deleteLastName);
-                            break;
+                    default:
+                        Console.WriteLine("Invalid input");
+                        break;
 
-                        case '4':
-                            selectedBook.DisplayContacts();
-                            break;
-
-                        case '5':
-                            keepRunning = false;
-                            break;
-
-                        default:
-                            Console.WriteLine("Invalid input");
-                            break;
-
-                    }
                 }
-
-
-
-                
-
-                Console.ReadLine();
             }
-        
+
+
+
+
+
+            Console.ReadLine();
+        }
+
     }
 }
