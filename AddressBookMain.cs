@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace AddressBookSystem
 {
+    
+    public class InvalidContactFieldException : Exception
+    {
+        public InvalidContactFieldException(string message) : base(message)
+        {
+        }
+    }
+
     public class Contact
     {
         public string FirstName { get; set; }
@@ -18,44 +23,37 @@ namespace AddressBookSystem
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
 
-        public bool Validate()
+        
+        public static string PromptForValidInput(string fieldName, string pattern, string errorMessage)
         {
-            if (!Regex.IsMatch(FirstName, @"^[A-Za-z]{2,}$"))
+            string input;
+            do
             {
-                Console.WriteLine("Invalid first name!");
-                return false;
-            }
+                try
+                {
+                    Console.Write($"Enter {fieldName}: ");
+                    input = Console.ReadLine();
 
-            if (!Regex.IsMatch(LastName, @"^[A-Za-z]{2,}$"))
-            {
-                Console.WriteLine("Invalid last name!");
-                return false;
-            }
+                    
+                    if (!Regex.IsMatch(input, pattern))
+                    {
+                        throw new InvalidContactFieldException(errorMessage);
+                    }
 
-            if (!Regex.IsMatch(Zip, @"^\d{6}$"))
-            {
-                Console.WriteLine("Invalid zip code!");
-                return false;
-            }
+                    return input; 
+                }
+                catch (InvalidContactFieldException ex)
+                {
+                    
+                    Console.WriteLine($"Error: {ex.Message}");
+                }
 
-            if (!Regex.IsMatch(PhoneNumber, @"(^\d{10}$)|(^\+[0-9]{2}[0-9]{10}$)"))
-            {
-                Console.WriteLine("Invalid phone number!");
-                return false;
-            }
-
-            if (!Regex.IsMatch(Email, @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"))
-            {
-                Console.WriteLine("Invalid email address!");
-                return false;
-            }
-
-            return true;
-
+            } while (true);
         }
     }
+
     public class AddressBook
-        {
+    {
         private List<Contact> contacts;
 
         public AddressBook()
@@ -63,18 +61,10 @@ namespace AddressBookSystem
             contacts = new List<Contact>();
         }
 
-        
         public void AddContact(Contact contact)
         {
-            if (contact.Validate())
-            {
-                contacts.Add(contact);
-                Console.WriteLine("Contact added successfully.");
-            }
-            else
-            {
-                Console.WriteLine("Failed to add contact due to validation errors.");
-            }
+            contacts.Add(contact);
+            Console.WriteLine("Contact added successfully.");
         }
 
         public void DisplayContacts()
@@ -85,9 +75,9 @@ namespace AddressBookSystem
             }
         }
     }
+
     internal class AddressBookMain
     {
-        
         static void Main(string[] args)
         {
             Console.WriteLine(new String('-', 50));
@@ -95,46 +85,67 @@ namespace AddressBookSystem
             Console.WriteLine(new String('-', 50));
             AddressBook addressBook = new AddressBook();
 
-            Console.Write("Enter First Name: ");
-            string firstName = Console.ReadLine();
-
-            Console.Write("Enter Last Name: ");
-            string lastName = Console.ReadLine();
-
-            Console.Write("Enter Address: ");
-            string address = Console.ReadLine();
-
-            Console.Write("Enter City: ");
-            string city = Console.ReadLine();
-
-            Console.Write("Enter State: ");
-            string state = Console.ReadLine();
-
-            Console.Write("Enter Zip: ");
-            string zip = Console.ReadLine();
-
-            Console.Write("Enter Phone Number: ");
-            string phoneNumber = Console.ReadLine();
-
-            Console.Write("Enter Email: ");
-            string email = Console.ReadLine();
-
-            // Create a new Contact
-            Contact contact = new Contact()
+            try
             {
-                FirstName = firstName,
-                LastName = lastName,
-                Address = address,
-                City = city,
-                State = state,
-                Zip = zip,
-                PhoneNumber = phoneNumber,
-                Email = email
-            };
+               
+                string firstName = Contact.PromptForValidInput(
+                    "First Name", @"^[A-Za-z]{2,}$", "Invalid first name! It must be at least 2 characters long and contain only letters."
+                );
 
-            // Add the contact to the address book
-            addressBook.AddContact(contact);
-            Console.ReadLine(); 
+                
+                string lastName = Contact.PromptForValidInput(
+                    "Last Name", @"^[A-Za-z]{2,}$", "Invalid last name! It must be at least 2 characters long and contain only letters."
+                );
+
+                
+                Console.Write("Enter Address: ");
+                string address = Console.ReadLine();
+
+                
+                Console.Write("Enter City: ");
+                string city = Console.ReadLine();
+
+                
+                Console.Write("Enter State: ");
+                string state = Console.ReadLine();
+
+                
+                string zip = Contact.PromptForValidInput(
+                    "Zip", @"^\d{6}$", "Invalid zip code! It must be exactly 6 digits."
+                );
+
+                
+                string phoneNumber = Contact.PromptForValidInput(
+                    "Phone Number", @"(^\d{10}$)|(^\+[0-9]{2}[0-9]{10}$)", "Invalid phone number! It must be 10 digits or follow international format with a country code."
+                );
+
+                
+                string email = Contact.PromptForValidInput(
+                    "Email", @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", "Invalid email address! Please provide a valid email in the format example@domain.com."
+                );
+
+                
+                Contact contact = new Contact()
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Address = address,
+                    City = city,
+                    State = state,
+                    Zip = zip,
+                    PhoneNumber = phoneNumber,
+                    Email = email
+                };
+
+                
+                addressBook.AddContact(contact);
+            }
+            catch (InvalidContactFieldException ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+            }
+
+            Console.ReadLine();
         }
     }
 }
