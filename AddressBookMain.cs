@@ -393,6 +393,24 @@ namespace AddressBookSystem
                 Console.WriteLine($"No contacts found in {state}.");
             }
         }
+        public int GetCountByCity(string city)
+        {
+            if (cityDictionary.ContainsKey(city))
+            {
+                return cityDictionary[city].Count;
+            }
+            return 0;
+        }
+
+        
+        public int GetCountByState(string state)
+        {
+            if (stateDictionary.ContainsKey(state))
+            {
+                return stateDictionary[state].Count;
+            }
+            return 0;
+        }
 
     }
 
@@ -443,7 +461,9 @@ namespace AddressBookSystem
                 Console.WriteLine("4. Delete Address Book");
                 Console.WriteLine("5. View Persons by City");
                 Console.WriteLine("6. View Persons by State");
-                Console.WriteLine("7. Exit");
+                Console.WriteLine("7. Get Count of Contacts by City");
+                Console.WriteLine("8. Get Count of Contacts by State");
+                Console.WriteLine("9. Exit");
                 Console.Write("Choose an option: ");
                 char option = Convert.ToChar(Console.ReadLine());
 
@@ -488,6 +508,20 @@ namespace AddressBookSystem
                         break;
 
                     case '7':
+                        Console.Write("Enter the name of the City: ");
+                        string cityName = Console.ReadLine();
+                        int cityCount = addressBookManager.GetCountByCity(cityName);
+                        Console.WriteLine($"Number of contacts in {cityName}: {cityCount}");
+                        break;
+
+                    case '8':
+                        Console.Write("Enter the name of the State: ");
+                        string stateName = Console.ReadLine();
+                        int stateCount = addressBookManager.GetCountByState(stateName);
+                        Console.WriteLine($"Number of contacts in {stateName}: {stateCount}");
+                        break;
+
+                    case '9':
                         exit = true;
                         break;
 
