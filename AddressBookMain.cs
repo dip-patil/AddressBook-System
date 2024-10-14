@@ -7,6 +7,12 @@ using System.Threading.Tasks;
 
 namespace AddressBookSystem
 {
+    public class InvalidContactException : Exception
+    {
+        public InvalidContactException(string message) : base(message)
+        {
+        }
+    }
     public class Contact
     {
         public string FirstName { get; set; }
@@ -20,53 +26,59 @@ namespace AddressBookSystem
 
         public bool Validate()
         {
-            if (!Regex.IsMatch(FirstName, @"^[A-Za-z]{2,}$"))
+           try { 
+
+                if (!Regex.IsMatch(FirstName, @"^[A-Za-z]{2,}$"))
+                {
+                    throw new InvalidContactException("Invalid first name!");
+
+                }
+
+                if (!Regex.IsMatch(LastName, @"^[A-Za-z]{2,}$"))
+                {
+                    throw new InvalidContactException("Invalid last name!");
+
+                }
+
+                if (!Regex.IsMatch(Zip, @"^\d{5}$"))
+                {
+                    throw new InvalidContactException("Invalid zip code!");
+
+                }
+
+                if (!Regex.IsMatch(PhoneNumber, @"(^\d{10}$)|(^\+[0-9]{2}[0-9]{10}$)"))
+                {
+                    throw new InvalidContactException("Invalid phone number!");
+
+                }
+
+                if (!Regex.IsMatch(Email, @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"))
+                {
+                    throw new InvalidContactException("Invalid email address!");
+
+                }
+                return true;
+             }
+            catch (InvalidContactException ex)
             {
-                Console.WriteLine("Invalid first name!");
+                Console.WriteLine($"Error: {ex.Message}");
                 return false;
             }
-
-            if (!Regex.IsMatch(LastName, @"^[A-Za-z]{2,}$"))
-            {
-                Console.WriteLine("Invalid last name!");
-                return false;
-            }
-
-            if (!Regex.IsMatch(Zip, @"^\d{5}$"))
-            {
-                Console.WriteLine("Invalid zip code!");
-                return false;
-            }
-
-            if (!Regex.IsMatch(PhoneNumber, @"(^\d{10}$)|(^\+[0-9]{2}[0-9]{10}$)"))
-            {
-                Console.WriteLine("Invalid phone number!");
-                return false;
-            }
-
-            if (!Regex.IsMatch(Email, @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"))
-            {
-                Console.WriteLine("Invalid email address!");
-                return false;
-            }
-
-            return true;
 
         }
     }
     public class AddressBook
-        {
+    {
 
-        }
+    }
     internal class AddressBookMain
     {
-        
         static void Main(string[] args)
         {
             Console.WriteLine(new String('-', 50));
             Console.WriteLine("Welcome to Address Book System");
             Console.WriteLine(new String('-', 50));
-            Console.ReadLine(); 
+            Console.ReadLine();
         }
     }
 }
