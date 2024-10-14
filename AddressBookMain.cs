@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace AddressBookSystem
 {
+    public class InvalidContactFieldException : Exception
+    {
+        public InvalidContactFieldException(string message) : base(message)
+        {
+        }
+    }
+
     public class Contact
     {
         public string FirstName { get; set; }
@@ -17,6 +21,29 @@ namespace AddressBookSystem
         public string Zip { get; set; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
+
+        public static string PromptForValidInput(string fieldName, string pattern, string errorMessage)
+        {
+            string input;
+            do
+            {
+                try
+                {
+                    Console.Write($"Enter {fieldName}: ");
+                    input = Console.ReadLine();
+                    if (!Regex.IsMatch(input, pattern))
+                    {
+                        throw new InvalidContactFieldException(errorMessage);
+                    }
+                    return input;
+                }
+                catch (InvalidContactFieldException ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message}");
+                }
+
+            } while (true);
+        }
 
         public bool Validate()
         {
@@ -51,11 +78,11 @@ namespace AddressBookSystem
             }
 
             return true;
-
         }
     }
+
     public class AddressBook
-        {
+    {
         private List<Contact> contacts;
 
         public AddressBook()
@@ -63,46 +90,18 @@ namespace AddressBookSystem
             contacts = new List<Contact>();
         }
 
-        
         public void AddContact()
         {
-            AddressBook addressBook = new AddressBook();
-
-            Console.Write("Enter First Name: ");
-            string firstName = Console.ReadLine();
-
-            Console.Write("Enter Last Name: ");
-            string lastName = Console.ReadLine();
-
-            Console.Write("Enter Address: ");
-            string address = Console.ReadLine();
-
-            Console.Write("Enter City: ");
-            string city = Console.ReadLine();
-
-            Console.Write("Enter State: ");
-            string state = Console.ReadLine();
-
-            Console.Write("Enter Zip: ");
-            string zip = Console.ReadLine();
-
-            Console.Write("Enter Phone Number: ");
-            string phoneNumber = Console.ReadLine();
-
-            Console.Write("Enter Email: ");
-            string email = Console.ReadLine();
-
-            // Create a new Contact
             Contact contact = new Contact()
             {
-                FirstName = firstName,
-                LastName = lastName,
-                Address = address,
-                City = city,
-                State = state,
-                Zip = zip,
-                PhoneNumber = phoneNumber,
-                Email = email
+                FirstName = Contact.PromptForValidInput("First Name", @"^[A-Za-z]{2,}$", "Invalid first name! It must be at least 2 characters long and contain only letters."),
+                LastName = Contact.PromptForValidInput("Last Name", @"^[A-Za-z]{2,}$", "Invalid last name! It must be at least 2 characters long and contain only letters."),
+                Address = Contact.PromptForValidInput("Address", @"^.+$", "Invalid address!"),
+                City = Contact.PromptForValidInput("City", @"^[A-Za-z ]+$", "Invalid city name!"),
+                State = Contact.PromptForValidInput("State", @"^[A-Za-z ]+$", "Invalid state name!"),
+                Zip = Contact.PromptForValidInput("Zip", @"^\d{6}$", "Invalid zip code! It must be exactly 6 digits."),
+                PhoneNumber = Contact.PromptForValidInput("Phone Number", @"(^\d{10}$)|(^\+[0-9]{2}[0-9]{10}$)", "Invalid phone number!"),
+                Email = Contact.PromptForValidInput("Email", @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", "Invalid email address!")
             };
 
             if (contact.Validate())
@@ -123,29 +122,19 @@ namespace AddressBookSystem
                 Console.WriteLine($"{contact.FirstName} {contact.LastName}");
             }
         }
+
         public void EditContact(string firstName, string lastName)
         {
             Contact contact = contacts.Find(c => c.FirstName == firstName && c.LastName == lastName);
 
             if (contact != null)
             {
-                Console.WriteLine("Enter new Address: ");
-                contact.Address = Console.ReadLine();
-
-                Console.WriteLine("Enter new City: ");
-                contact.City = Console.ReadLine();
-
-                Console.WriteLine("Enter new State: ");
-                contact.State = Console.ReadLine();
-
-                Console.WriteLine("Enter new Zip: ");
-                contact.Zip = Console.ReadLine();
-
-                Console.WriteLine("Enter new Phone Number: ");
-                contact.PhoneNumber = Console.ReadLine();
-
-                Console.WriteLine("Enter new Email: ");
-                contact.Email = Console.ReadLine();
+                contact.Address = Contact.PromptForValidInput("Address", @"^.+$", "Invalid address!");
+                contact.City = Contact.PromptForValidInput("City", @"^[A-Za-z ]+$", "Invalid city name!");
+                contact.State = Contact.PromptForValidInput("State", @"^[A-Za-z ]+$", "Invalid state name!");
+                contact.Zip = Contact.PromptForValidInput("Zip", @"^\d{6}$", "Invalid zip code! It must be exactly 6 digits.");
+                contact.PhoneNumber = Contact.PromptForValidInput("Phone Number", @"(^\d{10}$)|(^\+[0-9]{2}[0-9]{10}$)", "Invalid phone number!");
+                contact.Email = Contact.PromptForValidInput("Email", @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", "Invalid email address!");
 
                 Console.WriteLine("Contact updated successfully.");
             }
@@ -154,6 +143,7 @@ namespace AddressBookSystem
                 Console.WriteLine("Contact not found.");
             }
         }
+
         public void DeleteContact(string firstName, string lastName)
         {
             Contact contact = contacts.Find(c => c.FirstName == firstName && c.LastName == lastName);
@@ -168,35 +158,29 @@ namespace AddressBookSystem
                 Console.WriteLine("Contact not found.");
             }
         }
-
-
     }
+
     internal class AddressBookMain
     {
-        
         static void Main(string[] args)
         {
-            Console.WriteLine(new String('-', 50));
+            Console.WriteLine(new string('-', 50));
             Console.WriteLine("Welcome to Address Book System");
-            Console.WriteLine(new String('-', 50));
+            Console.WriteLine(new string('-', 50));
 
             AddressBook addressBook = new AddressBook();
 
-
-            //Edit,delete a contact
             bool keepRunning = true;
 
             while (keepRunning)
             {
-
                 Console.WriteLine("Choose an option:");
-
                 Console.WriteLine("Enter 1 to add a contact: ");
                 Console.WriteLine("Enter 2 to edit a contact: ");
-
                 Console.WriteLine("Enter 3 to delete a contact: ");
                 Console.WriteLine("Enter 4 to exit: ");
                 char c = Convert.ToChar(Console.ReadLine());
+
                 switch (c)
                 {
                     case '1':
@@ -209,7 +193,6 @@ namespace AddressBookSystem
                         string editLastName = Console.ReadLine();
                         addressBook.EditContact(editFirstName, editLastName);
                         break;
-
                     case '3':
                         Console.WriteLine("Enter the first name of the contact to delete: ");
                         string deleteFirstName = Console.ReadLine();
@@ -220,19 +203,14 @@ namespace AddressBookSystem
                     case '4':
                         keepRunning = false;
                         break;
-
                     default:
                         Console.WriteLine("Invalid input");
                         break;
-
                 }
             }
+
             
-
-
-            addressBook.DisplayContacts();
-
-            Console.ReadLine(); 
+            Console.ReadLine();
         }
     }
 }
